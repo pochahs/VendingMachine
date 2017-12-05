@@ -249,7 +249,7 @@ always @(DIGIT or SEG1 or SEG2) begin//자리수 개방
 end
 
 SevenSegment a1 (clk, rst, sum, SEG2);
-SevenSegment a2 (clk, rst, a, SEG1);
+SevenSegmetn a2 (clk, rst, a, SEG1);
             
 endmodule
 
