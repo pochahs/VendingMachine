@@ -25,7 +25,7 @@ reg [27:0] SEG1, SEG2;
 
 reg [6:0] a;
 
-always @(switch) begin //АЁАн update
+always @(switch) begin //price update
    if(switch[0]==1) nextsum = sum + 1;
    if(switch[1]==1) nextsum = sum + 5;
    if(switch[2]==1) nextsum = sum + 10;
