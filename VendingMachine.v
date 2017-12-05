@@ -234,7 +234,7 @@ begin
 endcase
 end
 
-always @(DIGIT or SEG1 or SEG2) begin//자리수 개방
+always @(DIGIT or SEG1 or SEG2) begin//update price
       case(DIGIT)
             8'b11111110: SEG = SEG1[6:0];
             8'b11111101: SEG = SEG1[13:7];
