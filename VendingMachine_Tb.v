@@ -17,8 +17,9 @@ reg [3:0] switch=0;
 
 VendingMachine m1(L_button, R_button, C_button, clk, rst, switch, DIGIT, SEG, LED);
         
-always begin
-   #clkPeriod clk=~clk;
+always #clkPeriod clk=~clk;
+
+always @(negedge clk) begin
    if ($time >= tlimit) $stop;
    else begin
       #10;
