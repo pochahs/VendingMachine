@@ -28,6 +28,7 @@ reg [6:0] a;
 always @(posedge clk) begin
      if(!rst) 
      begin
+          LED <= 10b'0;
           state <= 4b'0;
 	  nextstate<=4b'0;
           sum <= 7b'0;
