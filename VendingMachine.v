@@ -16,7 +16,7 @@ output [7:0] DIGIT;
 output [6:0] SEG;
 output [9:0] LED;
 
-reg state, nextstate;
+reg [3:0] state, nextstate;
 reg [6:0] sum, nextsum;
 reg [7:0] DIGIT;
 reg [9:0] LED;
@@ -28,9 +28,10 @@ reg [6:0] a;
 always @(posedge clk) begin
      if(!rst) 
      begin
-          LED <= 0;
-          state <= 0;
-          sum <= 0;
+          state <= 4b'0;
+	  nextstate<=4b'0;
+          sum <= 7b'0;
+	  nextsum<=7b'0;
           DIGIT <= 8'b11111110;
      end
      
