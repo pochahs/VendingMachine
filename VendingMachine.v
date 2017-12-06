@@ -21,16 +21,9 @@ reg [6:0] sum, nextsum;
 reg [7:0] DIGIT;
 reg [9:0] LED;
 reg [6:0] SEG;
-reg [27:0] SEG1, SEG2;
+wire [27:0] SEG1, SEG2;
 
 reg [6:0] a;
-
-always @(switch) begin //price update
-   if(switch[0]==1) nextsum = sum + 1;
-   if(switch[1]==1) nextsum = sum + 5;
-   if(switch[2]==1) nextsum = sum + 10;
-   if(switch[3]==1) nextsum = sum + 20;
-end
 
 always @(posedge clk) begin
      if(!rst) 
@@ -58,8 +51,14 @@ always @(posedge clk) begin
       end
 end
 
-always @(state or L_button or R_button)
-begin
+always @(switch or state or L_button or R_button)
+
+begin //price update
+   if(switch[0]==1) nextsum = sum + 1;
+   if(switch[1]==1) nextsum = sum + 5;
+   if(switch[2]==1) nextsum = sum + 10;
+   if(switch[3]==1) nextsum = sum + 20;
+
     case (state)
         0:
                 begin //SEG2 0000 
