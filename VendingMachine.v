@@ -28,11 +28,11 @@ reg [6:0] a;
 always @(posedge clk) begin
      if(!rst) 
      begin
-          LED <= 10b'0;
-          state <= 4b'0;
-	  nextstate<=4b'0;
-          sum <= 7b'0;
-	  nextsum<=7b'0;
+          LED <= 10'b0;
+          state <= 4'b0;
+	  nextstate<=4'b0;
+          sum <= 7'b0;
+	  nextsum<=7'b0;
           DIGIT <= 8'b11111110;
      end
      
