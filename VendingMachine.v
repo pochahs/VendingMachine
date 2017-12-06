@@ -16,8 +16,8 @@ output [7:0] DIGIT;
 output [6:0] SEG;
 output [9:0] LED;
 
-reg [3:0] state, nextstate;
-reg [6:0] sum, nextsum;
+reg [4:0] state, nextstate;
+reg [7:0] sum, nextsum;
 reg [7:0] DIGIT;
 reg [9:0] LED;
 reg [6:0] SEG;
