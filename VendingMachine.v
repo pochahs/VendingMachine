@@ -57,7 +57,7 @@ always @(switch or state or L_button or R_button)
 
 begin 
    //price update
-   if(sum<99) begin
+   if(sum<79) begin
    	if(switch[0]==1) nextsum = sum + 1;
    	if(switch[1]==1) nextsum = sum + 5;
    	if(switch[2]==1) nextsum = sum + 10;
