@@ -1,12 +1,12 @@
-`timescale 1ns / 1ps
+`timescale 1ns / 1ns
 
 module VendingMachine (L_button, R_button, C_button, clk, rst, switch, DIGIT, SEG, LED);
 
-parameter price0 = 7;
-parameter price1 = 5;
-parameter price2 = 6;
-parameter price3 = 10;
-parameter price4 = 8; 
+parameter [3:0] price0 = 7;
+parameter [3:0] price1 = 5;
+parameter [3:0] price2 = 6;
+parameter [3:0] price3 = 10;
+parameter [3:0] price4 = 8; 
 
 input L_button, R_button, C_button;
 input clk, rst;
