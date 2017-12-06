@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+`timescale 1ns / 1ns
 
 module VendingMachine (L_button, R_button, C_button, clk, rst, switch, DIGIT, SEG, LED);
 
@@ -28,35 +28,18 @@ reg clk_10000;
 reg [6:0] a;
 
 always@(posedge clk or negedge rst) begin
-    if(!rst) begin
+        
+if(!rst) begin
         count <= 32'd0;
         clk_10000<=0;
+	  LED <= 10'b0;
+          state <= 4'b0;
+	  sum <= 7'b0;
+	  nextsum<=7'b0;
+          DIGIT <= 8'b11111110;
     end
     else begin
-        if(count == 'd10000) begin
-            count <= 32'd0;
-            clk_10000 <= ~clk_10000;
-        end
-        else begin
-            count <= count +1;
-        end
-    end
-end    
-
-always @(posedge clk_10000) begin
-     if(!rst) 
-     begin
-          LED <= 10'b0;
-          state <= 4'b0;
-	      sum <= 7'b0;
-	      nextsum<=7'b0;
-          DIGIT <= 8'b11111110;
-     end
      
-     else
-     begin
-          state<=nextstate; 
-          sum<=nextsum;
           if (sum>=price4) LED[4]<=1;
           else LED[4]<=0; 
           if (sum>=price3) LED[3]<=1;
@@ -67,26 +50,35 @@ always @(posedge clk_10000) begin
           else LED[1]<=0;
           if (sum>=price0) LED[0]<=1;
           else LED[0]<=0;
-      end
-end
+
+	state<=nextstate;
+	sum<=nextsum;
+        if(count == 'd1) begin
+            count <= 32'd0;
+            clk_10000 <= ~clk_10000;
+        end
+        else begin
+            count <= count +1;
+        end
+    end
+end    
 
 always @(*)
 
 begin 
    //price update
     if(sum<79) begin
-   	if(switch[0]==1) nextsum = sum + 1; //모두 else
+   	if(switch[0]==1) nextsum = sum + 1;
+	else nextsum=sum; //모두 else
    	if(switch[1]==1) nextsum = sum + 5;
+	else nextsum=sum;
    	if(switch[2]==1) nextsum = sum + 10;
+	else nextsum=sum;
    	if(switch[3]==1) nextsum = sum + 20;
-	
+	else nextsum=sum;
     end
-   //else 
-   //default
-    LED[0] = 1; LED[1] = 1; LED[2] = 1; LED[3] = 1; LED[4] = 1;
-    LED[5] = 1; LED[6] = 1; LED[7] = 1; LED[8] = 1; LED[9] = 1;
-    a = 0; 
-    nextsum = sum;
+    else nextsum=sum;
+    
     case (state)
         0:
                 begin //SEG2 0000 
@@ -247,7 +239,7 @@ begin
         10: 
                begin //SEG2 0800 
                                                  
-                    LED[4] = 0;
+                    LED[9] = 0;
                     LED[6] = 0;
                     LED[5] = 1;
                     if (L_button & ~R_button) nextstate = 4;
@@ -260,6 +252,11 @@ begin
                             nextsum=sum-price0;
                         end
                 end
+	default: begin
+    		LED[5] = 0; LED[6] = 0; LED[7] = 0; LED[8] = 0; LED[9] = 0;
+    		a = 0; 
+    		//nextsum = sum;
+    	 end
 endcase
 end
 
@@ -277,8 +274,9 @@ always @(DIGIT or SEG1 or SEG2) begin
       endcase
 end
 
-SevenSegment a1 (clk_10000, rst, sum, SEG2);
-SevenSegment a2 (clk_10000, rst, a, SEG1);
-            
+//SevenSegment a1 (clk_10000, rst, sum, SEG2);
+//SevenSegment a2 (clk_10000, rst, a, SEG1);
+SevenSegment a1 (clk, rst, sum, SEG2);
+SevenSegment a2 (clk, rst, a, SEG1);   
 endmodule
 
