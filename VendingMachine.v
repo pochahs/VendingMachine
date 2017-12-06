@@ -1,4 +1,4 @@
-`timescale 1ns / 1ns
+`timescale 1ns / 1ps
 
 module VendingMachine (L_button, R_button, C_button, clk, rst, switch, DIGIT, SEG, LED);
 
@@ -23,16 +23,34 @@ reg [9:0] LED;
 reg [6:0] SEG;
 wire [27:0] SEG1, SEG2;
 
+reg[31:0] count;
+reg clk_10000;
 reg [6:0] a;
 
-always @(posedge clk) begin
+always@(posedge clk or negedge rst) begin
+    if(!rst) begin
+        count <= 32'd0;
+        clk_10000<=0;
+    end
+    else begin
+        if(count == 'd10000) begin
+            count <= 32'd0;
+            clk_10000 <= ~clk_10000;
+        end
+        else begin
+            count <= count +1;
+        end
+    end
+end    
+
+always @(posedge clk_10000) begin
      if(!rst) 
      begin
           LED <= 10'b0;
           state <= 4'b0;
-	  nextstate<=4'b0;
+	      //nextstate<=4'b0;
           sum <= 7'b0;
-	  nextsum<=7'b0;
+	      nextsum<=7'b0;
           DIGIT <= 8'b11111110;
      end
      
@@ -53,18 +71,19 @@ always @(posedge clk) begin
       end
 end
 
-always @(switch or state or L_button or R_button)
+always @(*)
 
 begin 
    //price update
-   if(sum<79) begin
-   	if(switch[0]==1) nextsum = sum + 1;
+    if(sum<79) begin
+   	if(switch[0]==1) nextsum = sum + 1; //¸ðµÎ else
    	if(switch[1]==1) nextsum = sum + 5;
    	if(switch[2]==1) nextsum = sum + 10;
    	if(switch[3]==1) nextsum = sum + 20;
 	
     end
-
+   //else 
+  //LED default , a=0, nextsum=sum;
     case (state)
         0:
                 begin //SEG2 0000 
@@ -74,6 +93,8 @@ begin
                     else if (LED[1]) nextstate = 4;
                     else if (LED[0]) nextstate = 5;
                     else nextstate = 0;
+                    
+                    
                 end 
 
         1: 
@@ -89,7 +110,7 @@ begin
                          begin
                             nextsum=sum-price4;
                          end
-               end           
+               end //else      nextsum=sum;
 
         2: 
                begin //SEG2 0550
@@ -239,7 +260,7 @@ begin
 endcase
 end
 
-always @(DIGIT or SEG1 or SEG2) begin//update price
+always @(DIGIT or SEG1 or SEG2) begin
       case(DIGIT)
             8'b11111110: SEG = SEG1[6:0];
             8'b11111101: SEG = SEG1[13:7];
