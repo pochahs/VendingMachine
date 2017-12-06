@@ -23,7 +23,7 @@ reg [9:0] LED;
 reg [6:0] SEG;
 wire [27:0] SEG1, SEG2;
 
-reg[31:0] count;
+reg [31:0] count;
 reg clk_10000;
 reg [6:0] a;
 
