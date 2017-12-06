@@ -48,8 +48,7 @@ always @(posedge clk_10000) begin
      begin
           LED <= 10'b0;
           state <= 4'b0;
-	      //nextstate<=4'b0;
-          sum <= 7'b0;
+	      sum <= 7'b0;
 	      nextsum<=7'b0;
           DIGIT <= 8'b11111110;
      end
@@ -83,7 +82,11 @@ begin
 	
     end
    //else 
-  //LED default , a=0, nextsum=sum;
+   //default
+    LED[0] = 1; LED[1] = 1; LED[2] = 1; LED[3] = 1; LED[4] = 1;
+    LED[5] = 1; LED[6] = 1; LED[7] = 1; LED[8] = 1; LED[9] = 1;
+    a = 0; 
+    nextsum = sum;
     case (state)
         0:
                 begin //SEG2 0000 
@@ -110,7 +113,7 @@ begin
                          begin
                             nextsum=sum-price4;
                          end
-               end //else      nextsum=sum;
+               end 
 
         2: 
                begin //SEG2 0550
