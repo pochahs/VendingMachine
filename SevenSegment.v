@@ -5,30 +5,13 @@ module SevenSegment(clk, rst ,value, SEG);
       input clk, rst;
       input [6:0] value;
       output[27:0] SEG;
+       
       
-      reg[31:0] count;
-      reg clk_10000;
-
       reg[27:0] SEG;
       
       reg value_h, value_t;  
       
-      always@(posedge clk or negedge rst) begin
-           if(!rst) begin
-                count <= 32'd0;
-                clk_10000<=0;
-           end
-           else begin
-                if(count == 'd10000) begin
-                    count <= 32'd0;
-                    clk_10000 <= ~clk_10000;
-                end
-                else begin
-                    count <= count +1;
-                end
-           end
-      end     
-      
+
       always @(posedge clk) begin
            if(rst==1) begin
                 value_h = value%10;

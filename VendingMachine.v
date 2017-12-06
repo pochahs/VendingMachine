@@ -25,7 +25,26 @@ wire [27:0] SEG1, SEG2;
 
 reg [6:0] a;
 
-always @(posedge clk) begin
+
+      reg[31:0] count;
+      reg clk_10000;
+      always@(posedge clk or negedge rst) begin
+           if(!rst) begin
+                count <= 32'd0;
+                clk_10000<=0;
+           end
+           else begin
+                if(count == 'd10000) begin
+                    count <= 32'd0;
+                    clk_10000 <= ~clk_10000;
+                end
+                else begin
+                    count <= count +1;
+                end
+           end
+      end    
+
+always @(posedge clk_10000) begin
      if(!rst) 
      begin
           LED <= 10'b0;
@@ -55,11 +74,15 @@ end
 
 always @(switch or state or L_button or R_button)
 
-begin //price update
-   if(switch[0]==1) nextsum = sum + 1;
-   if(switch[1]==1) nextsum = sum + 5;
-   if(switch[2]==1) nextsum = sum + 10;
-   if(switch[3]==1) nextsum = sum + 20;
+begin 
+   //price update
+   if(sum<99) begin
+   	if(switch[0]==1) nextsum = sum + 1;
+   	if(switch[1]==1) nextsum = sum + 5;
+   	if(switch[2]==1) nextsum = sum + 10;
+   	if(switch[3]==1) nextsum = sum + 20;
+	
+    end
 
     case (state)
         0:
@@ -249,8 +272,8 @@ always @(DIGIT or SEG1 or SEG2) begin//update price
       endcase
 end
 
-SevenSegment a1 (clk, rst, sum, SEG2);
-SevenSegment a2 (clk, rst, a, SEG1);
+SevenSegment a1 (clk_10000, rst, sum, SEG2);
+SevenSegment a2 (clk_10000, rst, a, SEG1);
             
 endmodule
 

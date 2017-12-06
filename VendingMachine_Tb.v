@@ -40,6 +40,8 @@ always @(*) begin
       switch[1] = $random % 2;
       switch[2] = $random % 2;
       switch[3] = $random % 2;
+      #30;
+      switch=4'b0;
    end
 end
 integer i;
