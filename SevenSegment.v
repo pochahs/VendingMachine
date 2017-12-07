@@ -3,7 +3,7 @@
 module SevenSegment(clk, rst ,value, SEG);
 
       input clk, rst;
-      input [6:0] value;
+      input [7:0] value;
       output[27:0] SEG;
        
       
