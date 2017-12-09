@@ -19,15 +19,14 @@ output [9:0] LED;
 reg [4:0] state, nextstate;
 reg [7:0] sum, nextsum;
 reg [7:0] DIGIT;
-reg [9:0] LED;
+reg [4:0] LED;
 reg [4:0] LED_reg;
 reg [6:0] SEG;
 wire [27:0] SEG1, SEG2;
-reg [7:0] TmpDigit;
 
 reg [31:0] count;
 reg clk_10000;
-reg [6:0] a;
+reg [7:0] priceTmp, price;
 
 always@(posedge clk or negedge rst) begin
     if(!rst) begin
@@ -65,8 +64,9 @@ always@(posedge clk_10000 or negedge rst) begin
           if (sum>=price0) LED_reg[0]<=1;
           else LED_reg[0]<=0;
 
-	state<=nextstate;
-	sum<=nextsum;
+	state <= nextstate;
+	sum <= nextsum;
+	price <= priceTmp;
         
         if(clk_10000) begin
                DIGIT <= {DIGIT[6:0], DIGIT[7]};
@@ -74,20 +74,6 @@ always@(posedge clk_10000 or negedge rst) begin
         
     end
 end
-
-always @(DIGIT or SEG1 or SEG2) begin
-      case(DIGIT)
-            8'b11111110: SEG = SEG1[6:0];
-            8'b11111101: SEG = SEG1[13:7];
-            8'b11111011: SEG = SEG1[20:14];
-            8'b11110111: SEG = SEG1[27:21]; 
-            8'b11101111: SEG = SEG2[6:0];
-            8'b11011111: SEG = SEG2[13:7];
-            8'b10111111: SEG = SEG2[20:14];
-            8'b01111111: SEG = SEG2[27:21];
-            default: SEG = 7'b11111111;
-      endcase
-end    
 
 always @(*)
 
@@ -106,8 +92,8 @@ begin
     else nextsum=sum;
     
     LED[0] = 0; LED[1] = 0; LED[2] = 0; LED[3] = 0; LED[4] = 0; 
-    LED[5] = 0; LED[6] = 0; LED[7] = 0; LED[8] = 0; LED[9] = 0;
-    a = 0; 
+    //LED[5] = 0; LED[6] = 0; LED[7] = 0; LED[8] = 0; LED[9] = 0;
+    priceTmp = 0; 
     
     case (state)
         0:
@@ -125,162 +111,172 @@ begin
                begin //SEG2 0700
                                 
                     LED[4] = 1;
-                    LED[9] = 1;
-                    if (L_button & ~R_button) nextstate = 5;
+                    priceTmp = price4;
+                    
+                    if (C_button) begin
+                         nextsum = sum - priceTmp;   
+                         end                 
+                    else if (L_button & ~R_button) nextstate = 5;
                     else if (~L_button & R_button) nextstate = 2;
-                    else nextstate = 6;
-                    a = price4; 
+                    else nextstate = 1;                  
                                         
-                    if(C_button)
-                         begin
-                            nextsum=sum-price4;
-                         end
+                    
                end 
 
         2: 
                begin //SEG2 0550
                                                    
                     LED[3] = 1;
-                    LED[8] = 1;
-                    if (L_button & ~R_button) nextstate = 1;
-                    else if (~L_button & R_button) nextstate = 3; 
-                    else nextstate = 7; 
-                    a = price3;
+                    priceTmp = price3;
                     
-                    if(C_button)
-                        begin
-                            nextsum=sum-price3;
-                        end
+                    if (C_button)begin
+                         nextsum = sum - priceTmp;
+                         end
+                    else if (L_button & ~R_button) nextstate = 1;
+                    else if (~L_button & R_button) nextstate = 3; 
+                    else nextstate = 2; 
+                    
+                    
                 end
 
         3: 
                begin //SEG2 0600
                                   
                     LED[2] = 1;
-                    LED[7] = 1;                         
-                    if (L_button & ~R_button) nextstate = 2; 
+                    priceTmp = price2;
+                                   
+                    if (C_button) begin
+                         nextsum = sum - priceTmp;
+                         end                         
+                    else if (L_button & ~R_button) nextstate = 2; 
                     else if (~L_button & R_button) nextstate = 4; 
-                    else nextstate = 8;  
-                    a = price2;
+                    else nextstate = 3;  
                     
-                    if(C_button)
-                        begin
-                            nextsum=sum-price2;
-                        end
                 end
 
         4: 
                begin //SEG2 1000
                     
                     LED[1] = 1;
-                    LED[6] = 1;
-                    if (L_button & ~R_button) nextstate = 3; 
-                    else if (~L_button & R_button) nextstate = 5; 
-                    else nextstate = 9; 
-                    a = price1; 
+                    priceTmp = price1;
                     
-                    if(C_button)
-                        begin
-                            nextsum=sum-price1;
-                        end
+                    if (C_button) begin
+                         nextsum = sum - priceTmp;
+                    end
+                    else if (L_button & ~R_button) nextstate = 3; 
+                    else if (~L_button & R_button) nextstate = 5; 
+                    else nextstate = 4; 
+                    
                 end
 
         5: 
                 begin //SEG2 0800 
                 
                     LED[0] = 1;
-                    LED[5] = 1;
-                    if (L_button & ~R_button) nextstate = 4;
-                    else if (~L_button & R_button) nextstate = 1; 
-                    else nextstate = 10; 
-                    a = price0;
+                    priceTmp = price0;
                     
-                    if(C_button)
-                        begin
-                            nextsum=sum-price0;
-                        end
+                    if (C_button) begin
+                         nextsum = sum - priceTmp;
+                         end
+                    else if (L_button & ~R_button) nextstate = 4;
+                    else if (~L_button & R_button) nextstate = 1; 
+                    else nextstate = 5; 
+                    
                 end
 
-        6: 
-                begin //SEG2 0800 
+//        6: 
+//                begin //SEG2 0800 
                 
-                    LED[9] = 1;
-                    if (L_button & ~R_button) nextstate = 5;
-                    else if (~L_button & R_button) nextstate = 2;
-                    else nextstate = 1; 
-                    a = price4;
+//                    LED[9] = 1;
+//                    if (L_button & ~R_button) nextstate = 5;
+//                    else if (~L_button & R_button) nextstate = 2;
+//                    else nextstate = 1; 
+//                    price = price4;
                     
-                    if(C_button)
-                        begin
-                            nextsum=sum-price4;
-                        end
-                end 
+//                    if(C_button)
+//                        begin
+//                            nextsum=sum-price4;
+//                        end
+//                end 
 
-        7: 
-                begin //SEG2 0800 
+//        7: 
+//                begin //SEG2 0800 
                     
-                    LED[8] = 1;
-                    if (L_button & ~R_button) nextstate = 1;
-                    else if (~L_button & R_button) nextstate = 3; 
-                    else nextstate = 2; 
-                    a = price3;
+//                    LED[8] = 1;
+//                    if (L_button & ~R_button) nextstate = 1;
+//                    else if (~L_button & R_button) nextstate = 3; 
+//                    else nextstate = 2; 
+//                    price = price3;
 
-                    if(C_button)
-                        begin
-                            nextsum=sum-price3;
-                        end
-                end 
+//                    if(C_button)
+//                        begin
+//                            nextsum=sum-price3;
+//                        end
+//                end 
 
-        8: 
-                begin
+//        8: 
+//                begin
                     
-                    LED[7] = 1;
-                    if (L_button & ~R_button) nextstate = 2;
-                    else if (~L_button & R_button) nextstate = 4; 
-                    else nextstate = 3;
-                    a = price2;
+//                    LED[7] = 1;
+//                    if (L_button & ~R_button) nextstate = 2;
+//                    else if (~L_button & R_button) nextstate = 4; 
+//                    else nextstate = 3;
+//                    price = price2;
                     
-                    if(C_button)
-                        begin
-                            nextsum=sum-price2;
-                        end
-                end 
+//                    if(C_button)
+//                        begin
+//                            nextsum=sum-price2;
+//                        end
+//                end 
 
-        9: 
-                begin //SEG2 0800 
+//        9: 
+//                begin //SEG2 0800 
                                        
-                    LED[6] = 1;
-                    if (L_button & ~R_button) nextstate = 3;
-                    else if (~L_button & R_button) nextstate = 5;
-                    else nextstate = 4; 
-                    a = price1;
+//                    LED[6] = 1;
+//                    if (L_button & ~R_button) nextstate = 3;
+//                    else if (~L_button & R_button) nextstate = 5;
+//                    else nextstate = 4; 
+//                    price = price1;
     
-                    if(C_button)
-                        begin
-                            nextsum=sum-price1;
-                        end
+//                    if(C_button)
+//                        begin
+//                            nextsum=sum-price1;
+//                        end
 
-                end 
+//                end 
 
-        10: 
-               begin //SEG2 0800 
+//        10: 
+//               begin //SEG2 0800 
                     
-                    LED[5] = 1;
-                    if (L_button & ~R_button) nextstate = 4;
-                    else if (~L_button & R_button) nextstate = 1;
-                    else nextstate = 5;
-                    a = price0;
+//                    LED[5] = 1;
+//                    if (L_button & ~R_button) nextstate = 4;
+//                    else if (~L_button & R_button) nextstate = 1;
+//                    else nextstate = 5;
+//                    price = price0;
 
-                    if(C_button)
-                        begin
-                            nextsum=sum-price0;
-                        end
-                end    	
+//                    if(C_button)
+//                        begin
+//                            nextsum=sum-price0;
+//                        end
+//                end    	
 endcase
 end
 
-SevenSegment a1 (clk_10000, rst, sum, SEG2);
-SevenSegment a2 (clk_10000, rst, a, SEG1);
-   
-endmodule
+always @(DIGIT or SEG1 or SEG2) begin
+      case(DIGIT)
+            8'b11111110: SEG = SEG1[6:0];
+            8'b11111101: SEG = SEG1[13:7];
+            8'b11111011: SEG = SEG1[20:14];
+            8'b11110111: SEG = SEG1[27:21]; 
+            8'b11101111: SEG = SEG2[6:0];
+            8'b11011111: SEG = SEG2[13:7];
+            8'b10111111: SEG = SEG2[20:14];
+            8'b01111111: SEG = SEG2[27:21];
+            default: SEG = 7'b11111111;
+      endcase
+end  
 
+SevenSegment a1 (clk_10000, rst, sum, SEG2);
+SevenSegment a2 (clk_10000, rst, price , SEG1);
+ 
+endmodule
